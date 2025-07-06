@@ -1,18 +1,26 @@
-# tools
-node_modules
-coverage
-config.local.ts
-.dumi/tmp
-.dumi/tmp-test
-.dumi/tmp-production
-.idea
-.vscode
-.node
-.history
-.DS_Store
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# util assets
+node_modules
 dist
-es
-icons
-package-lock.json
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.history

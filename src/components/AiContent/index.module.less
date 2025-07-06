@@ -1,0 +1,44 @@
+.padding() {
+  // 用这个 padding 的原因：使用 width+margin 的话，会导致内部滚动条不在最右边
+  padding: 0 calc((100% - 766px) / 2);
+}
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #141414;
+  overflow: hidden;
+
+  .reportMenuContent {
+    height: calc(100% - 56px);
+  }
+}
+
+.docCopilotMode {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  .back {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 2.9%;
+  }
+}
+
+:global(.compact) {
+  .container {
+    width: 100%;
+  }
+}
+
+:global(.light) {
+  .container {
+    background-color: #fff;
+  }
+}
