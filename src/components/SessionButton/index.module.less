@@ -1,0 +1,71 @@
+.sessionButton {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  padding: 0 8px;
+  height: 36px;
+  margin: 0 auto 8px;
+  line-height: 22px;
+  font-size: 14px;
+
+  // .iconMessage {
+  //   width: 14px;
+  //   height: 14px;
+  //   margin-left: 12px;
+  //   margin-right: 8px;
+  // }
+
+  .question {
+    width: 100%;
+    min-height: 22px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .operate {
+    display: none;
+    width: 48px;
+    height: 40px;
+
+    .edit {
+      margin-right: 4px;
+    }
+
+    .disabled {
+      color: #999;
+      cursor: not-allowed;
+    }
+  }
+
+  &:hover {
+    color: #1677ff;
+    background: rgba(0, 145, 255, 10%);
+    cursor: pointer;
+
+    .operate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &.active {
+    color: #1677ff;
+    background: rgba(0, 145, 255, 10%);
+  }
+
+  .checkOutlined,
+  .closeOutlined {
+    font-size: 12px;
+
+    &:hover {
+      color: #1677ff;
+    }
+  }
+
+  .checkOutlined {
+    margin: 0 4px;
+  }
+}

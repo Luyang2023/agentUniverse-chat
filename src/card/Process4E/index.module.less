@@ -1,0 +1,110 @@
+.taskProcess {
+  display: block;
+  border-radius: 6px;
+  overflow: hidden;
+
+  .engineeringFramework {
+    display: inline-block;
+    margin: 0 6px;
+    color: #1668dc;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+  height: 58px;
+  padding-left: 16px;
+  color: var(--font-color-1);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: var(--background-color-2);
+  cursor: pointer;
+  overflow: hidden;
+
+  .avatar {
+    width: 24px;
+  }
+
+  .iconList {
+    display: flex;
+    column-gap: 6px;
+  }
+}
+
+.taskContainer {
+  padding: 6px 16px 0;
+  border-radius: 0 0 6px 6px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--background-color-2);
+  cursor: pointer;
+
+  & > div {
+    margin-bottom: 8px;
+  }
+
+  div[class='ant-steps-item-title']:has(.customFrameWorkContainer) {
+    width: 100%;
+  }
+
+  .title {
+    margin-right: 8px;
+    display: flex;
+    justify-content: space-between;
+    line-height: 32px;
+  }
+
+  :global {
+    .ant-steps-finish-icon { // 魔改antd样式，改变icon颜色
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 20px;
+      width: 20px;
+      background-color: #1677ff;
+      color: #fff;
+      border-radius: 50%;
+    }
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.introduction {
+  max-width: 500px;
+  padding: 0 16px;
+  white-space: pre-line;
+  font-size: 12px;
+  line-height: 2;
+}
+
+.syncOutlinedContener {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background-color: #1677ff;
+}
+
+.syncOutlined {
+  font-size: 14px;
+  color: var(--font-color-1);
+}
+
+:global(.light) {
+  .syncOutlined {
+    color: #fff;
+  }
+}
+
+:global(.isShare) {
+  .showTaskProcess, .taskContainer {
+    background-color: var(--share-second-background-color);
+    padding-bottom: 6px;
+  }
+}

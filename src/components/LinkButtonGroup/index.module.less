@@ -1,0 +1,51 @@
+.linkButtonGroupContainer {
+  display: flex;
+  flex-direction: row;
+
+  .linkButtonGroup {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    
+  
+    .button {
+      margin: 8px 8px 8px 0;
+      display: flex;
+      align-items: center;
+    }
+  
+    .buttonInner {
+      max-width: 300px;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  
+  .toggleDiv {
+    align-self: flex-end;
+  }
+}
+
+.isMobile {
+  display: block;
+}
+
+
+.listStyle {
+  width: 200px;
+  margin: 10px 10px 0 0;
+  height: 28px;
+  line-height: 28px;
+  font-size: 12px;
+  border: 1px solid #1668dc;
+  border-radius: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #1668dc;
+}
+
+.listIconStyle {
+  margin: 0 8px;
+}

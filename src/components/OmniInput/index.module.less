@@ -1,0 +1,131 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.skillContainer {
+  margin-bottom: 12px;
+}
+
+.inputContainer {
+  margin: 1px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 12px 48px 0 var(--border-color);
+  background: var(--background-color-3);
+  overflow: hidden;
+}
+
+.skillWrap {
+  display: flex;
+  flex-direction: column;
+
+  .skillTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--background-color-2);
+    color: var(--font-color-2);
+
+    .skillLeft {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+    }
+  
+    .title {
+      display: flex;
+      align-items: center;
+      column-gap: 8px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+  }
+
+  .skillContent {
+    padding: 12px 0;
+  }
+}
+
+.inputBox {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  width: calc(100% - 2px);
+  padding: 12px;
+  margin: 1px;
+
+  .textArea {
+    width: calc(100% - 52px);
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-top: 4px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.5;
+  
+    &:disabled {
+      cursor: not-allowed;
+    }
+  
+    &:focus {
+      border: none;
+    }
+  
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .footerRight {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+
+    .submitButton {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+      width: 28px;
+      padding: 8px;
+      text-align: center;
+      font-size: large;
+      border-radius: 6px;
+    }
+  }
+}
+
+// 富文本样式
+.slateSpan {
+  display: inline-block;
+  margin: 2px 3px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  word-break: break-word;
+  background: rgba(240, 245, 255, 100%);
+  color: rgba(0, 87, 255, 100%);
+}
+
+.startPoint {
+  position: relative;
+  width: 0;
+  height: 0;
+  text-align: center;
+  overflow: visible;
+  user-select: none;
+
+  .placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: max-content;
+    opacity: .3;
+    pointer-events: none;
+  }
+}
