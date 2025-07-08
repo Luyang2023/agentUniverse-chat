@@ -8,7 +8,7 @@ agentUniverse-chat 是面向业务的 Chat UI SDK，提供了一套完整的聊�
 ## 快速使用
 
 ```tsx | pure
-import AuChat from 'agentUniverse-chat';
+import AuChat from 'agent-universe-chat';
 
 const chat = new AuChat({
   container: document.getElementById('chat'), // 挂载的 DOM 元素
@@ -46,7 +46,7 @@ message 实例的数据结构见：
 ### 监听消息
 
 ```ts
-import { Event } from 'agentUniverse-chat';
+import { Event } from 'agent-universe-chat';
 
 chat.on(Event.MESSAGE_SEND, (role, message) => {
   console.log(role, message);
@@ -58,7 +58,7 @@ chat.on(Event.MESSAGE_SEND, (role, message) => {
 ## 模块
 ### Card 卡片
 ```tsx | pure
-import { Card } from 'agentUniverse-chat';
+import { Card } from 'agent-universe-chat';
 
 chat.
 <Card.Markdown type={'text'}>{ message.content }</Card.Markdown>
