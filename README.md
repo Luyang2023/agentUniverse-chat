@@ -1,6 +1,6 @@
-# au-chat
+# agentUniverse-chat
 
-au-chat 是面向业务的 Chat UI SDK，提供了一套完整的聊天机器人解决方案，包括会话管理、消息管理、技能管理、Copilot模式、事件订阅、移动端适配、主题切换等功能。
+agentUniverse-chat 是面向业务的 Chat UI SDK，提供了一套完整的聊天机器人解决方案，包括会话管理、消息管理、技能管理、Copilot模式、事件订阅、移动端适配、主题切换等功能。
 能够帮助业务侧快速的实现商业级别的大模型对话服务。
 
 --------------------
@@ -8,9 +8,9 @@ au-chat 是面向业务的 Chat UI SDK，提供了一套完整的聊天机器人
 ## 快速使用
 
 ```tsx | pure
-import ZChat from 'au-chat';
+import AuChat from 'agentUniverse-chat';
 
-const chat = new ZChat({
+const chat = new AuChat({
   container: document.getElementById('chat'), // 挂载的 DOM 元素
   disableSession: true, // 是否禁用会话管理
 });
@@ -46,7 +46,7 @@ message 实例的数据结构见：
 ### 监听消息
 
 ```ts
-import { Event } from 'au-chat';
+import { Event } from 'agentUniverse-chat';
 
 chat.on(Event.MESSAGE_SEND, (role, message) => {
   console.log(role, message);
@@ -58,7 +58,7 @@ chat.on(Event.MESSAGE_SEND, (role, message) => {
 ## 模块
 ### Card 卡片
 ```tsx | pure
-import { Card } from 'au-chat';
+import { Card } from 'agentUniverse-chat';
 
 chat.
 <Card.Markdown type={'text'}>{ message.content }</Card.Markdown>
