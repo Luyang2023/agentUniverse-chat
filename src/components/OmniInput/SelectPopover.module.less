@@ -1,0 +1,64 @@
+.popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  padding: 6px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 10000px rgba(0, 0, 0, 15%);
+  z-index: 1000;
+  margin-top: 4px;
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+.item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  outline: none;
+  border: none;
+  border-block-end: none !important;
+  border-radius: 12px;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 4%);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.active {
+  background-color: rgba(0, 0, 0, 6%);
+}
+
+.itemContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: #666;
+}
+
+.label {
+  font-size: 14px;
+  color: #333;
+}
+
+.desc {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+}

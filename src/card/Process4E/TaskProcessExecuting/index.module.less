@@ -1,0 +1,68 @@
+.executing {
+  color: var(--font-color-1);
+
+  .tree {
+    margin-top: 8px;
+    padding: 14px 0;
+    background-color: transparent;
+    color: var(--font-color-1);
+    font-size: 14px;
+
+    :global(.ant-tree) {
+      background-color: var(--background-color-1);
+    }
+
+    &.expandButton {
+      :global {
+        .ant-tree-switcher {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .btn {
+    margin: 0 12px 12px 0;
+    color: #1677ff;
+    background: rgba(0, 145, 255, 10%);
+    border: none;
+  }
+
+  .source {
+    padding-top: 8px;
+  }
+
+  .title {
+    margin: 12px 0 0;
+  }
+}
+
+div[class='ant-steps-item-title']:has(.customFrameWorkContainer) {
+  width: 100%;
+}
+
+.customFrameWorkButton {
+  position: relative;
+  left: 26px;
+}
+
+.form {
+  padding: 6px 16px;
+  border-radius: 0 0 6px 6px;
+  margin-right: 8px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--background-color-1);
+  cursor: pointer;
+
+  & > div {
+    margin-bottom: 8px;
+  }
+}
+
+:global(.share-scalable) {
+  .tree {
+    font-size: 12px;
+    padding: 0;
+    margin-left: 8px;
+  }
+}

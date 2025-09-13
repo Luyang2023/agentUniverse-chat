@@ -1,0 +1,33 @@
+.menuButton {
+  width: 80%;
+  height: 40px;
+  display: flex;
+  line-height: 40px;
+  margin: 4px auto;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  
+  .icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+  }
+
+  .label {
+    margin-left: 10px;
+  }
+
+  &.active {
+    color: #1677ff;
+    background: rgba(0, 145, 255, 10%);
+    
+    .icon {
+      color: #fff;
+      background: #1071F8;
+    }
+  }
+}

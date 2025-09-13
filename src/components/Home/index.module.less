@@ -1,0 +1,40 @@
+@headerHeight: 56px;
+
+.container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+}
+
+.body {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+
+  &.showAlert {
+    height: calc(100% - @headerHeight - 38px); // 38是alert的高度
+  }
+
+  .siderContainer {
+    width: 240px;
+    flex-shrink: 0;
+
+    &.hidden {
+      display: none;
+    }
+  
+    &.fixed {
+      z-index: 10;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 10%);
+    }
+  }
+}

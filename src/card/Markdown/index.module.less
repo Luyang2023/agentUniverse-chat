@@ -1,0 +1,130 @@
+.markdown {
+  letter-spacing: 1px;
+  line-height: 26px;
+  color: inherit;
+  font-size: 14px;
+
+  p:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  &.user {
+    p {
+      margin-bottom: 0;
+    }
+  }
+
+  
+  ul {
+    // 处理 tailwind css 导致的 list 不显示 order 的问题
+    // https://stackoverflow.com/questions/77548370/react-markdown-not-displaying-ordered-list
+    list-style: disc;
+    padding-left: 2rem;
+    margin: 0.5rem 0;
+  }
+
+  ol {
+    list-style: disc;
+    padding-left: 2rem;
+    margin: 0.5rem 0;
+  }
+
+  em {
+    font-size: 17px;
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  pre {
+    white-space: unset;
+    overflow: visible;
+  }
+
+  thead {
+    text-align: left;
+  }
+
+  th {
+    background-color: var(--background-color-1);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.25rem 0.75rem;
+    min-width: 120px;
+    color: var(--font-color-1);
+  }
+
+  td {
+    color: var(--font-color-1);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.25rem 0.75rem;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: initial;
+    font-weight: 500;
+    margin: 8px 0;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin: 12px 0;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  h4 {
+    font-size: 14px;
+  }
+  
+  table {
+    display: block;
+    max-width: 100%;
+    margin: 16px 0;
+    overflow: auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  a {
+    color: #4f93f0;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  :global(.highlight) {
+    text-decoration: underline;
+    text-decoration-thickness: 0.5em;
+    text-decoration-color: rgba(255, 228, 0, 40%);
+    text-underline-offset: -0.2em;
+    text-decoration-skip-ink: none;
+  }
+
+}
+
+.markdown h2:not(:first-of-type) {
+  margin-top: 4px;
+}
+
+// html2canvas对li做转换时，前缀数字和符号会与文本重叠
+:global(.fixMarkdown2Html) {
+  li {
+    padding-left: 12px;
+  }
+}
+
+:global(.share-scalable) {
+  .markdown {
+    font-size: 12px;
+    margin-left: 0;
+    margin-top: 0;
+  }
+}

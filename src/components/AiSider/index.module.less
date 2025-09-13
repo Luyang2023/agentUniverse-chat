@@ -1,0 +1,91 @@
+.sider {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--background-color-2);
+  color: var(--font-color-1);
+  overflow-y: auto;
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 56px;
+    padding: 12px 20px;
+
+    .logo {
+      height: 24px;
+
+      img {
+        display: block;
+        height: 100%;
+      }
+    }
+  }
+
+  .addButton {
+    width: calc(100% - 32px);
+    display: block;
+    margin: 8px auto 16px;
+  }
+
+  .spinContainer {
+    width: 100%;
+  }
+  
+
+  .explain {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-weight: normal;
+    color: #aaa;
+    margin: 8px 0;
+  }
+
+  .historySession {
+    display: flex;
+    align-items: center;
+    
+    >span {
+      margin-left: 8px;
+    }
+  }
+
+  .bottom {
+    width: 100%;
+    align-self: flex-end;
+    flex-grow: 1;
+  }
+
+  :global {
+    .ant-collapse-item {
+      background-color: var(--background-color-2);
+    }
+  }
+}
+
+// 移动端下亮色主题更改背景色
+:global(.compact.light) {
+  .sider {
+    background-color: var(--background-color-2);
+  }
+}
+
+:global(.light) {
+  .sider {
+    border-right: none;
+  }
+}
+
+:global(.compact) {
+  .sider {
+    padding-top: 0;
+    border-right: 0;
+  }
+}
