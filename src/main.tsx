@@ -1,17 +1,30 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AuChat, { Card, Event, MessageStatus } from './index';
 import ReactDOM from 'react-dom/client';
+import useChatStreamHandler from './hooks/useChatStreamHandler';
+import useAgentList, { AgentInfo } from './hooks/useAgentList';
 
-const delay = async (ms: number) => new Promise(resolve => {
-  setTimeout(resolve, ms);
-});
+const delay = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const App = () => {
   const chatRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const auChat = new AuChat({
-      container: chatRef.current,
+  const [auChatInstance, setAuChatInstance] = useState<AuChat | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<AgentInfo | null>(null);
+  const { agents, loading } = useAgentList();
 
+  // 设置默认智能体
+  useEffect(() => {
+    if (!selectedAgent && agents.length > 0) {
+      setSelectedAgent(agents[0]);
+    }
+  }, [agents, selectedAgent]);
+
+
+  useEffect(() => {
+    if (!chatRef.current) return;
+
+    const chat = new AuChat({
+      container: chatRef.current,
       product: {
         logo: <img src='https://gw.alipayobjects.com/zos/finxbff/compress-tinypng/QBYeBCymJCQGCgUDcKADp/yuantulogo3.png' />,
         darkLogo: <img src='https://gw.alipayobjects.com/zos/finxbff/compress-tinypng/Ek69FC46jbmc4rBmNKiLa/899A7B21_C634_4135_B7E9_D16C1C3BE4D5.png' />,
@@ -40,101 +53,102 @@ const App = () => {
 
       sessionHandler: {
         async initSessionList() {
-          return [
-            {
-              id: '1', title: '市净率是什么', attachment: [
-                {
-                  id: '1',
-                  type: 'image',
-                  name: '测试图片',
-                  source: 'https://images.unsplash.com/photo-1500259571355-332da5cb07aa?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2F0fGVufDB8fDB8fHww',
-                }
-              ]
-            },
-            { id: '2', title: '2024年的中国经济走向，核心关注什么' },
-            { id: '3', title: '分短期和中长期来看,医药反腐政策对行业会产生何种影响' },
-          ];
+          try {
+            const response = await fetch('http://127.0.0.1:8888/session/list');
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            // 后端返回的格式已经是 { id: string, title: string }，直接返回即可
+            return data;
+          } catch (error) {
+            console.error('Failed to fetch session list:', error);
+            return [];
+          }
         },
-        async addSession() {
+        async addSession({ title }: { title: string }) {
           await delay(1000);
-          return { id: 4, title: '新建问题' };
+          const newSessionId = Math.random().toString(36).substring(2, 10);
+          console.log(`New session added with ID: ${newSessionId}`);
+          // 根据 Session 类的构造函数，需要传入 store 参数
+          // 这里暂时不创建 Session 实例，只打印日志
+          console.log(`New session title: ${title}`);
+          // 参考 useSessionStore.tsx 中的 addSession 方法
+          // 实际应用中需要创建 Session 实例并返回
         },
-        async deleteSession(id: string) {
-          return true;
+        async deleteSession(sessionId: string) {
+          try {
+            const response = await fetch('http://127.0.0.1:8888/session/delete', {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ session_id: sessionId }),
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            console.log(`Session ${sessionId} deleted successfully.`);
+          } catch (error) {
+            console.error(`Failed to delete session ${sessionId}:`, error);
+          }
         },
-        async updateSession(id: string, title: string) {
-          return true;
+        async updateSession(sessionId: string, title: string) {
+          try {
+            const response = await fetch('http://127.0.0.1:8888/session/update', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ session_id: sessionId, query: title }),
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            console.log(`Session ${sessionId} updated to title: ${title}`);
+          } catch (error) {
+            console.error(`Failed to update session ${sessionId}:`, error);
+          }
         }
       },
 
       messageHandler: {
         async initMessageList(sessionId: string) {
-          await delay(1000);
-          return [
-            { id: 1, role: 'user', content: '市净率是什么' },
-            {
-              id: 2, 
-              role: 'assistant', 
-              content: [
-                {
-                  card: Card.Markdown,
-                  props: {
-                    children: '市盈率是xxxxx',
-                    speed: 100,
-                  },
-                },
-              ]
-            },
-          ]
-
+          try {
+            const response = await fetch(`http://127.0.0.1:8888/session/${sessionId}/history`);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            // 后端返回的数据格式已经符合前端 AuChat 期望的消息数组格式，直接返回即可
+            return data;
+          } catch (error) {
+            console.error(`Failed to fetch messages for session ${sessionId}:`, error);
+            return [];
+          }
         },
       },
     });
 
+    setAuChatInstance(chat);
 
-    auChat.on(Event.PROMPT_SEND, (prompt, sessionId) => {
-      console.log('prompt', prompt);
-      const answerMessage = auChat.pushAssistantMessage({
-        id: Math.random().toString(36).substring(2, 15),
-        status: MessageStatus.RUNNING,
-        title: prompt.content,
-        content: [
-          {
-            card: Card.Markdown,
-            props: {
-              children: `我是回答，你可以使用markdown格式`,
-              speed: 200,
-            },
-          },
-        ]
-      });
-
-      // chat.mergePrompt({
-      //   attachment: [
-      //     {
-      //       id: '1',
-      //       type: 'image',
-      //       name: '测试图片',
-      //       url: 'https://images.unsplash.com/photo-1500259571355-332da5cb07aa?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2F0fGVufDB8fDB8fHww',
-      //     }
-      //   ]
-      // })
-
-      setTimeout(() => {
-        answerMessage.update({
-          status: MessageStatus.SUCCESS,
-        });
-      }, 500);
-    });
+    return () => {
+      // if (chat && typeof chat.destroy === 'function') {
+      //   chat.destroy();
+      // }
+    };
   }, []);
 
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <div ref={chatRef} style={{ width: '100%', height: '100%' }}></div>
+    <div style={{ width: '100vw', height: '100vh', display: 'flex' }}>
+      {/* 主体区域 */}
+      <div style={{ flex: 1, height: '100%' }}>
+        <div ref={chatRef} style={{ width: '100%', height: '100%' }}></div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

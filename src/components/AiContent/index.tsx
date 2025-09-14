@@ -57,9 +57,9 @@ const AiContent = () => {
                     </div>
                   }
                 </div> 
-              </div> 
-            }          
-            <AiCopilot isDocCopilotMode={true} />
+              </div>
+            }
+            <AiCopilot isDocCopilotMode={true} auChatInstance={chat} />
           </div>
         )
       } else {
@@ -68,7 +68,7 @@ const AiContent = () => {
     } else {
       return <div style={{ display: 'flex', width: '100%', height: copilot?.isOpen ? '100%' : 'calc(100% - 56px)' }}>
         {currentMenuContent}
-        <AiCopilot isDocCopilotMode={true} />
+        <AiCopilot isDocCopilotMode={true} auChatInstance={chat} />
       </div> ;
     }
   };
@@ -79,7 +79,7 @@ const AiContent = () => {
         !hiddenHeader && <AiHead />
       }
       {
-        activeRoute !== 'session' ? renderSlot() : <AiCopilot />
+        activeRoute !== 'session' ? renderSlot() : <AiCopilot auChatInstance={chat} />
       }
     </div>
   );
