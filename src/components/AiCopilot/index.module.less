@@ -57,6 +57,20 @@
  
 }
 
+.chatContainerWrap {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: inherit;
+}
+
+.chatMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .artifactContainer {
   display: flex;
   flex-shrink: 0;
@@ -145,6 +159,16 @@
   display: flex;
   flex-direction: column;
   .padding();
+
+  .inputRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .inputContainer {
+    flex: 1;
+  }
 
   .safeTip {
     padding: 12px 0;
