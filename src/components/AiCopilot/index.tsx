@@ -15,6 +15,9 @@ import useChatStore from '@/store/useChatStore';
 import Bubble from '@/components/AiBubble';
 import WelcomeWithRecommend from '@/components/WelcomeWithRecommend';
 import OmniInput from '@/components/OmniInput';
+import AgentSelector from '@/components/AgentSelector/AgentSelector';
+import useAgentList, { AgentInfo } from '@/hooks/useAgentList';
+import useChatStreamHandler from '@/hooks/useChatStreamHandler';
 import styles from './index.module.less';
 import { CSSProperties } from 'styled-components';
 import useScrollVisibility from '@/hooks/useScrollVisibility';
@@ -30,10 +33,11 @@ const MemorizedOmniInput = React.memo(OmniInput, (prevProps, nextProps) => {
 interface Props {
   isDocCopilotMode?: boolean,
   style?: CSSProperties,
+  auChatInstance: any; // 或者使用更具体的类型，如 AuChat | null
 }
 
-const AiCopilot: React.FC<Props> = ({ isDocCopilotMode = false, style }) => {
-  const { messageListLoading, sendPrompt } = useSessionStore((state) => state);
+const AiCopilot: React.FC<Props> = ({ isDocCopilotMode = false, style, auChatInstance }) => {
+  const { messageListLoading, sendPrompt, activeSessionId, setActiveSessionId } = useSessionStore((state) => state);
   const activeSession = useSessionStore(selectActiveSession);
   const inputRunning = useSessionStore(selectInputRunning);
   // @ts-nocheck
@@ -43,6 +47,21 @@ const AiCopilot: React.FC<Props> = ({ isDocCopilotMode = false, style }) => {
   const { safeTip, copilot, activeRoute, isCompact, setCopilot, container } = useConfigStore();
   const { setMisc, scrollToBottom, artifactLoading, artifact, setArtifact, artifactStyle } = useMiscStore();
   const chat = useChatStore(state => state.chat);
+
+  // 获取智能体列表
+  const { agents, loading } = useAgentList();
+  // 当前选中的智能体
+  const [selectedAgent, setSelectedAgent] = useState<AgentInfo | null>(null);
+
+  // 设置默认智能体
+  useEffect(() => {
+    if (!selectedAgent && agents.length > 0) {
+      setSelectedAgent(agents[0]);
+    }
+  }, [agents, selectedAgent]);
+
+  // 调用 useChatStreamHandler hook
+  useChatStreamHandler({ auChatInstance, serviceId: selectedAgent?.service_id || 'demo_service', currentSessionId: activeSessionId, onSessionIdChange: setActiveSessionId });
 
   // 表示是否允许自动滚动到底部
   const [isAllowAutoScrollToBottom, setAllowAutoScrollToBottom] = useState<boolean>(true);
@@ -128,9 +147,9 @@ const AiCopilot: React.FC<Props> = ({ isDocCopilotMode = false, style }) => {
       >
         {
           copilot?.isFolding && !copilot?.isOpen &&
-            <LeftCircleOutlined 
-            className={styles.leftIcon} 
-            onClick={() => handleShow(true)} 
+            <LeftCircleOutlined
+            className={styles.leftIcon}
+            onClick={() => handleShow(true)}
           />
         }
         {isShowRecommend && !isDocCopilotMode && (
@@ -147,38 +166,50 @@ const AiCopilot: React.FC<Props> = ({ isDocCopilotMode = false, style }) => {
           }
         </div>}
         {!isShowRecommend && (
-          <>
-          <Spin spinning={messageListLoading} style={{ marginTop: 20 }}></Spin>
-          <div
-            ref={chatRef}
-            className={classNames([styles.chatContainer, {
-              [styles.hiddenScrollBar]: !isScrolling
-            }])}
-            onWheel={handleWheel}
-          >
-            
-              {messageList.map((message) => (
-                <Bubble
-                  key={message.id}
-                  message={message}
-                />
-              ))}
-            
-            {!isEmpty(lastMessage?.relateQuestion) && (
-              <RelationQuestion
-                questions={lastMessage?.relateQuestion || []}
-                onClickItem={handleSendPrompt}
-              />
-            )}
+          <div className={styles.chatContainerWrap}>
+            <div className={styles.chatMain}>
+              <Spin spinning={messageListLoading} style={{ marginTop: 20 }}></Spin>
+              <div
+                ref={chatRef}
+                className={classNames([styles.chatContainer, {
+                  [styles.hiddenScrollBar]: !isScrolling
+                }])}
+                onWheel={handleWheel}
+              >
+                
+                  {messageList.map((message) => (
+                    <Bubble
+                      key={message.id}
+                      message={message}
+                    />
+                  ))}
+                
+                {!isEmpty(lastMessage?.relateQuestion) && (
+                  <RelationQuestion
+                    questions={lastMessage?.relateQuestion || []}
+                    onClickItem={handleSendPrompt}
+                  />
+                )}
+              </div>
+            </div>
           </div>
           </>
         )}
         <div className={styles.footContainer}>
-          <MemorizedOmniInput
-            running={inputRunning}
-            onAbort={handleClickAbort}
-            onSubmit={handleSendPrompt}
-          />
+          <div className={styles.inputRow}>
+            <AgentSelector
+              agents={agents}
+              selectedAgent={selectedAgent}
+              onAgentSelect={(agent) => setSelectedAgent(agent)}
+            />
+            <div className={styles.inputContainer}>
+              <MemorizedOmniInput
+                running={inputRunning}
+                onAbort={handleClickAbort}
+                onSubmit={handleSendPrompt}
+              />
+            </div>
+          </div>
           <div className={styles.safeTip}>{ safeTip }</div>
         </div>
       </div>
