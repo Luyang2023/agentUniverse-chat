@@ -87,7 +87,7 @@ const App = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ session_id: sessionId, query: title }),
+            body: JSON.stringify({ session_id: sessionId, title: title }),
           });
           console.log('updateSession', sessionId, title);
         },

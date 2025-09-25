@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef, useLayoutEffect } from 'react';
 import { Button, Tooltip, Divider, AutoComplete, AutoCompleteProps } from 'antd';
 import classnames from 'classnames';
 import { debounce, isUndefined } from 'lodash';
@@ -36,6 +36,25 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
   const [ selectPopoverVisible, setSelectPopoverVisible ] = useState(false);
   const [ agentModalVisible, setAgentModalVisible ] = useState(false);
   const currentSkill = skillOptions?.find(([skill]) => skill.type === prompt?.skill?.type);
+
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const [inputHeight, setInputHeight] = useState<number | 'auto'>('auto');
+
+  useLayoutEffect(() => {
+    const inputEl = inputContainerRef.current;
+    if (!inputEl) return;
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        setInputHeight(entry.contentRect.height);
+      }
+    });
+
+    resizeObserver.observe(inputEl);
+
+    // Cleanup
+    return () => resizeObserver.disconnect();
+  }, []);
 
   const handleRichInputChange = ({content, raw}: {content: string, raw?: Node[]}) => {
     if (content === '@' && skillOptions?.length) {
@@ -89,7 +108,7 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
 
 
   return (
-    <div className={styles.container}>
+    <div className={styles.wrapper}>
       <div className={styles.skillContainer}>
         {
           !currentSkill && skillOptions && !isDocCopilotMode && (
@@ -117,15 +136,6 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
           onClickAway={() => setSelectPopoverVisible(false)}
         />
       }
-      <div className={styles.agentSelectContainer}>
-        <Tooltip title={agentList.find(agent => agent.service_id === selectedAgentId)?.agent_name || '选择智能体'}>
-          <Button className={styles.agentSelectButton} onClick={() => setAgentModalVisible(true)}>
-            <span className={styles.buttonText}>
-              {agentList.find(agent => agent.service_id === selectedAgentId)?.agent_name || '选择智能体'}
-            </span>
-          </Button>
-        </Tooltip>
-      </div>
       <AgentSelectionModal
         visible={agentModalVisible}
         onCancel={() => setAgentModalVisible(false)}
@@ -133,108 +143,120 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
         selectedAgentId={selectedAgentId || null}
         onSelectAgent={setSelectedAgentId}
       />
-      <div className={styles.inputContainer}>
-        {
-          currentSkill && (
-            <div className={styles.skillWrap}>
-              <div className={styles.skillTop}>
-                <div className={styles.skillLeft}>
-                  <div className={styles.title}>
-                    { React.createElement(currentSkill[0].Icon) }
-                    { currentSkill[0].label }
+      <div className={styles.container}>
+        <div className={styles.agentSelectContainer}>
+          <Tooltip title={agentList.find(agent => agent.service_id === selectedAgentId)?.agent_name || '选择智能体'}>
+            <Button
+              className={styles.agentSelectButton}
+              onClick={() => setAgentModalVisible(true)}
+              style={{ height: inputHeight }}
+            >
+              {agentList.find(agent => agent.service_id === selectedAgentId)?.agent_name || '选择智能体'}
+            </Button>
+          </Tooltip>
+        </div>
+        <div className={styles.inputContainer} ref={inputContainerRef}>
+          {
+            currentSkill && (
+              <div className={styles.skillWrap}>
+                <div className={styles.skillTop}>
+                  <div className={styles.skillLeft}>
+                    <div className={styles.title}>
+                      { React.createElement(currentSkill[0].Icon) }
+                      { currentSkill[0].label }
+                    </div>
+                    {
+                      currentSkill[0].Header && (
+                        <>
+                          <Divider type="vertical" />
+                          { React.createElement(
+                            currentSkill[0].Header,
+                            {
+                              ...currentSkill[1],
+                              chat,
+                              prompt,
+                            },
+                          ) }
+                        </>
+                      )
+                    }
                   </div>
                   {
-                    currentSkill[0].Header && (
-                      <>
-                        <Divider type="vertical" />
-                        { React.createElement(
-                          currentSkill[0].Header,
-                          {
-                            ...currentSkill[1],
-                            chat,
-                            prompt,
-                          },
-                        ) }
-                      </>
+                    !currentSkill[0].disableClose && (
+                      <Tooltip title="退出技能">
+                        <Button icon={<CloseOutlined />} type="text" onClick={handleCloseSkill} />
+                      </Tooltip>
                     )
                   }
                 </div>
                 {
-                  !currentSkill[0].disableClose && (
-                    <Tooltip title="退出技能">
-                      <Button icon={<CloseOutlined />} type="text" onClick={handleCloseSkill} />
-                    </Tooltip>
+                  currentSkill[0].Content && (
+                    <div className={styles.skillContent}>
+                      {
+                        React.createElement(
+                          currentSkill[0].Content,
+                          {
+                            ...currentSkill[1],
+                            chat,
+                            prompt,
+                          }
+                        )
+                      }
+                    </div>
                   )
                 }
               </div>
-              {
-                currentSkill[0].Content && (
-                  <div className={styles.skillContent}>
-                    {
-                      React.createElement(
-                        currentSkill[0].Content,
-                        {
-                          ...currentSkill[1],
-                          chat,
-                          prompt,
-                        }
+            )
+          }
+          {
+            !input?.hidden && <AutoComplete
+            options={options}
+            style={{ width: '100%', height: '100%' }}
+            onSelect={onSelect}
+            onSearch={debounce(handleSearch, suggestPoppover?.delay)}
+            disabled={!!suggestPoppover}
+          >
+            <div className={classnames(styles.inputBox)}>
+              <EasyInput
+                onChange={handleRichInputChange}
+                placeholder={currentSkill?.[0].placeholder || input?.placeholder || '请输入你的问题'}
+                onEnter={handleSendEvent}
+                disabled={!isUndefined(input?.disabled) ? input.disabled : running}
+              />
+              <div className={styles.footerRight}>
+                  { enableAlipayVoice &&
+                    <VoiceButton
+                      inputDisabled={running}
+                      onChange={handleVoiceButtonChange}
+                    />
+                  }
+                  <Divider type="vertical" style={{height: '24px'}}/>
+                  {
+                    running
+                      ? (
+                          <ShineBorder
+                            shinning
+                            borderRadius={12}
+                            color={["#A07CFE", "#FE8FB5", "#FFBE7B", "#2566e8", "#00b2f0"]}
+                          >
+                            <Button icon={<PauseCircleFilled />} className={styles.submitButton} onClick={onAbort} />
+                          </ShineBorder>
+                        )
+                      : (
+                        <Button
+                          disabled={!isUndefined(input?.disabled) ? input.disabled : running}
+                          type="primary"
+                          icon={<ArrowUpOutlined />}
+                          className={styles.submitButton}
+                          onClick={handleSendEvent}
+                        />
                       )
-                    }
-                  </div>
-                )
-              }
+                  }
+              </div>
             </div>
-          )
-        }
-        {
-          !input?.hidden && <AutoComplete
-          options={options}
-          style={{ width: '100%', height: '100%' }}
-          onSelect={onSelect}
-          onSearch={debounce(handleSearch, suggestPoppover?.delay)}
-          disabled={!!suggestPoppover}
-        >
-          <div className={classnames(styles.inputBox)}>
-            <EasyInput
-              onChange={handleRichInputChange}
-              placeholder={currentSkill?.[0].placeholder || input?.placeholder || '请输入你的问题'}
-              onEnter={handleSendEvent}
-              disabled={!isUndefined(input?.disabled) ? input.disabled : running}
-            />
-            <div className={styles.footerRight}>
-                { enableAlipayVoice &&
-                  <VoiceButton
-                    inputDisabled={running}
-                    onChange={handleVoiceButtonChange}
-                  />
-                }
-                <Divider type="vertical" style={{height: '24px'}}/>
-                {
-                  running
-                    ? (
-                        <ShineBorder
-                          shinning
-                          borderRadius={12}
-                          color={["#A07CFE", "#FE8FB5", "#FFBE7B", "#2566e8", "#00b2f0"]}
-                        >
-                          <Button icon={<PauseCircleFilled />} className={styles.submitButton} onClick={onAbort} />
-                        </ShineBorder>
-                      )
-                    : (
-                      <Button
-                        disabled={!isUndefined(input?.disabled) ? input.disabled : running}
-                        type="primary"
-                        icon={<ArrowUpOutlined />}
-                        className={styles.submitButton}
-                        onClick={handleSendEvent}
-                      />
-                    )
-                }
-            </div>
-          </div>
-        </AutoComplete>
-        }
-        
+          </AutoComplete>
+          }
+        </div>
       </div>
     </div>
   );
