@@ -10,11 +10,13 @@ import type { Prompt } from '@/store/useSessionStore';
 import useConfigStore from '@/store/useConfigStore';
 import useChatStore from '@/store/useChatStore';
 import usePromptStore from '@/store/useInputStore';
+import useAgentStore from '@/store/useAgentStore'; // 导入 useAgentStore
 import ShineBorder from "@/components/magicui/shine-border";
 import AdaptiveButtonList from '@/components/AdaptiveButtonList';
 // import RichInput from './RichInput';
 import EasyInput from './EasyInput';
 import SelectPopover from './SelectPopover';
+import AgentSelectionModal from '../AgentSelectionModal';
 import styles from './index.module.less';
 import VoiceButton from '../VoiceButton';
 
@@ -30,7 +32,9 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
   const chat = useChatStore(state => state.chat);
   const { skills: skillOptions, input, isDocCopilotMode, enableAlipayVoice, suggestPoppover } = useConfigStore(state => state);
   const { prompt, disableSend } = usePromptStore(state => state);
+  const { agentList, selectedAgentId, setSelectedAgentId } = useAgentStore(state => state); // 获取 agentList, selectedAgentId 和 setSelectedAgentId
   const [ selectPopoverVisible, setSelectPopoverVisible ] = useState(false);
+  const [ agentModalVisible, setAgentModalVisible ] = useState(false);
   const currentSkill = skillOptions?.find(([skill]) => skill.type === prompt?.skill?.type);
 
   const handleRichInputChange = ({content, raw}: {content: string, raw?: Node[]}) => {
@@ -47,7 +51,7 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
 
   const handleSendEvent = () => {
     if (!prompt?.content.trim()) return;
-    onSubmit(prompt);
+    onSubmit({ ...prompt, serviceId: selectedAgentId });
   };
 
   const handleCloseSkill = () => {
@@ -113,6 +117,22 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
           onClickAway={() => setSelectPopoverVisible(false)}
         />
       }
+      <div className={styles.agentSelectContainer}>
+        <Tooltip title={agentList.find(agent => agent.service_id === selectedAgentId)?.agent_name || '选择智能体'}>
+          <Button className={styles.agentSelectButton} onClick={() => setAgentModalVisible(true)}>
+            <span className={styles.buttonText}>
+              {agentList.find(agent => agent.service_id === selectedAgentId)?.agent_name || '选择智能体'}
+            </span>
+          </Button>
+        </Tooltip>
+      </div>
+      <AgentSelectionModal
+        visible={agentModalVisible}
+        onCancel={() => setAgentModalVisible(false)}
+        agents={agentList}
+        selectedAgentId={selectedAgentId || null}
+        onSelectAgent={setSelectedAgentId}
+      />
       <div className={styles.inputContainer}>
         {
           currentSkill && (
@@ -175,11 +195,6 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
           disabled={!!suggestPoppover}
         >
           <div className={classnames(styles.inputBox)}>
-            {/* <RichInput
-              onChange={handleRichInputChange}
-              placeholder={currentSkill?.[0].placeholder || input?.placeholder || '请输入你的问题'}
-              onEnter={handleSendEvent}
-            /> */}
             <EasyInput
               onChange={handleRichInputChange}
               placeholder={currentSkill?.[0].placeholder || input?.placeholder || '请输入你的问题'}
@@ -187,9 +202,9 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
               disabled={!isUndefined(input?.disabled) ? input.disabled : running}
             />
             <div className={styles.footerRight}>
-                { enableAlipayVoice && 
-                  <VoiceButton 
-                    inputDisabled={running} 
+                { enableAlipayVoice &&
+                  <VoiceButton
+                    inputDisabled={running}
                     onChange={handleVoiceButtonChange}
                   />
                 }
@@ -221,7 +236,6 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
         }
         
       </div>
-      
     </div>
   );
 };

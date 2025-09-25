@@ -133,11 +133,14 @@ const useSessionStore = create<SessionStore>()(
       if (!useConfigStore.getState().disabledSession && !useConfigStore.getState().openAI) {
         res = await useConfigStore.getState().sessionHandler?.addSession({ title });
         // 更新session id
-        // @ts-ignore
-        session = session.update({id: res.id, title: res.title || title });
-        set({
-          activeSessionId: res.id,
-        });
+        // 修复：只有当 res 存在且有 id 时才更新 session id 和 title，以避免 TypeError
+        if (res && res.id) {
+          // @ts-ignore
+          session = session.update({id: res.id, title: res.title || title });
+          set({
+            activeSessionId: res.id,
+          });
+        }
       }
       return session;
     },
@@ -269,35 +272,44 @@ const useSessionStore = create<SessionStore>()(
       get().pushUserMessage(session.id, prompt);
       useChatStore.getState().chat.emit(Event.PROMPT_SEND, prompt, session.id);
 
-      const openAIConfig = useConfigStore.getState().openAI;
-      if (openAIConfig) {
-        let answerMessage = get().pushAssistantMessage(session.id,{
-          id: nanoid(),
-          status: MessageStatus.RUNNING,
-        });
+      const sessionHandler = useConfigStore.getState().sessionHandler;
+      console.log('Sending prompt:', { sessionId: session.id, prompt }); // 添加日志
+      if (sessionHandler && sessionHandler.sendPrompt) {
+        // 如果存在 sessionHandler 并且有 sendPrompt 方法，则通过它发送
+        await sessionHandler.sendPrompt({ sessionId: session.id, prompt });
+      } else {
+        // 否则，回退到 OpenAI 或其他默认逻辑
+        const openAIConfig = useConfigStore.getState().openAI;
+        if (openAIConfig) {
+          let answerMessage = get().pushAssistantMessage(session.id,{
+            id: nanoid(),
+            status: MessageStatus.RUNNING,
+          });
 
-        const openai = new OpenAI(openAIConfig);
-        const completion = await openai.chat.completions.create({
-          model: "qwen-plus",  //模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
-          messages: [
-              { role: "system", content: "You are a helpful assistant." },
-              { role: "user", content: prompt.content }
-          ],
-        });
-        answerMessage.update({
-          status: MessageStatus.SUCCESS,
-          content: [
-            {
-              // @ts-ignore
-              card: Card.Markdown,
-              props: {
-                children: completion.choices[0].message.content,
-                speed: 250,
-              },
-            }
-          ],
-          contentString: completion.choices[0].message.content,
-        });
+          const openai = new OpenAI(openAIConfig);
+          const completion = await openai.chat.completions.create({
+            model: "qwen-plus",  //模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: prompt.content },
+                { role: "system", content: `Selected service ID: ${prompt.serviceId}` }
+            ],
+          });
+          answerMessage.update({
+            status: MessageStatus.SUCCESS,
+            content: [
+              {
+                // @ts-ignore
+                card: Card.Markdown,
+                props: {
+                  children: completion.choices[0].message.content,
+                  speed: 250,
+                },
+              }
+            ],
+            contentString: completion.choices[0].message.content,
+          });
+        }
       }
     },
 
