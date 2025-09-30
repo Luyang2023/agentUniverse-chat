@@ -58,15 +58,16 @@ const App = () => {
           return data.map((item: any) => new Session({
             id: item.id,
             title: item.title,
+            serviceId: item.service_id, // 新增 service_id
             store: useSessionStore.getState(),
           }));
         },
         // 添加会话
-        async addSession({ title }: { title: string }): Promise<{ id: string; title: string }> {
+        async addSession({ title, service_id }: { title: string, service_id?: string }): Promise<{ id: string; title: string }> {
           // 后端没有提供添加会话的接口，这里暂时模拟
           await delay(1000);
           const newId = Math.random().toString(36).substring(2, 8); // 模拟后端生成ID，缩短长度
-          console.log('addSession', title, newId);
+          console.log('addSession', title, newId, service_id);
           return { id: newId, title };
         },
         // 删除会话
@@ -87,7 +88,7 @@ const App = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ session_id: sessionId, query: title }),
+            body: JSON.stringify({ session_id: sessionId, title: title }),
           });
           console.log('updateSession', sessionId, title);
         },

@@ -1,8 +1,14 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .container {
   display: flex;
-  flex-direction: column; /* 恢复为列布局 */
-  position: relative;
-  /* gap: 12px; */ /* 移除间距，通过 agentSelectContainer 的定位来控制 */
+  flex-direction: row;
+  align-items: flex-end; /* 恢复为底部对齐 */
+  gap: 8px; /* 按钮和输入框之间的间距 */
 }
 
 .skillContainer {
@@ -134,35 +140,31 @@
 }
 
 .agentSelectContainer {
-  position: absolute;
-  left: -150px; /* 调整以适应新按钮宽度 */
-  bottom: 12px;
-  display: flex;
-  align-items: center;
+  /* No special styles needed now */
 }
 
 .agentSelectButton {
   width: 140px; /* 固定宽度 */
-  height: 40px; /* 固定高度 */
+   height: 54px;  
   padding: 0 12px;
+  border-radius: 12px !important; /* 与输入框圆角一致 */
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--background-color-3) !important;
+  box-shadow: 0 12px 48px 0 var(--border-color);
+  transition: all 0.2s ease-in-out;
+  
+  /* 以下为修复文字截断和溢出的关键样式 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  /* 使用 Flex 确保内部文字在拉伸后依然居中 */
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px !important;
-  border: 1px solid var(--border-color) !important;
-  background-color: var(--background-color-3) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
 
   &:hover {
     border-color: #1677ff !important;
     color: #1677ff !important;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   }
-}
-
-.buttonText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
