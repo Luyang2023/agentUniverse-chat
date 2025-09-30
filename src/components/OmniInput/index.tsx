@@ -10,6 +10,7 @@ import type { Prompt } from '@/store/useSessionStore';
 import useConfigStore from '@/store/useConfigStore';
 import useChatStore from '@/store/useChatStore';
 import usePromptStore from '@/store/useInputStore';
+import useSessionStore from '@/store/useSessionStore';
 import useAgentStore from '@/store/useAgentStore'; // 导入 useAgentStore
 import ShineBorder from "@/components/magicui/shine-border";
 import AdaptiveButtonList from '@/components/AdaptiveButtonList';
@@ -32,6 +33,7 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
   const chat = useChatStore(state => state.chat);
   const { skills: skillOptions, input, isDocCopilotMode, enableAlipayVoice, suggestPoppover } = useConfigStore(state => state);
   const { prompt, disableSend } = usePromptStore(state => state);
+  const { sessionList, activeSessionId, addSession } = useSessionStore(state => state);
   const { agentList, selectedAgentId, setSelectedAgentId } = useAgentStore(state => state); // 获取 agentList, selectedAgentId 和 setSelectedAgentId
   const [ selectPopoverVisible, setSelectPopoverVisible ] = useState(false);
   const [ agentModalVisible, setAgentModalVisible ] = useState(false);
@@ -141,7 +143,17 @@ const OmniInput: React.FC<Props> = ({ running, onSubmit, onAbort }) => {
         onCancel={() => setAgentModalVisible(false)}
         agents={agentList}
         selectedAgentId={selectedAgentId || null}
-        onSelectAgent={setSelectedAgentId}
+        onSelectAgent={(agentId) => {
+          const activeSession = sessionList.find(s => s.id === activeSessionId);
+          if (activeSession && activeSession.serviceId && activeSession.serviceId !== agentId) {
+            addSession({
+              serviceId: agentId,
+            });
+            setSelectedAgentId(agentId);
+          } else {
+            setSelectedAgentId(agentId);
+          }
+        }}
       />
       <div className={styles.container}>
         <div className={styles.agentSelectContainer}>

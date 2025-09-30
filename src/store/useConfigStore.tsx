@@ -99,7 +99,7 @@ export interface ConfigState {
   feedbackFormList: any[];
   sessionHandler?: {
     initSessionList(): Promise<Session[]>;
-    addSession({title}: {title: string}): Promise<{ id: string; title: string }>;
+    addSession({title, service_id}: {title: string, service_id?: string}): Promise<{ id: string; title: string }>;
     deleteSession(sessionId: string): Promise<void>;
     updateSession(sessionId: string, title: string): Promise<void>;
     sendPrompt?: ({ sessionId, prompt }: { sessionId: string; prompt: Prompt }) => Promise<void>;

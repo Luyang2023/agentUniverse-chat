@@ -12,6 +12,7 @@ import { Card } from '@/index';
 import useConfigStore from './useConfigStore';
 import useChatStore from './useChatStore';
 import useMiscStore from './useMiscStore';
+import useAgentStore from './useAgentStore';
 
 import Message, {
   MessageError,
@@ -84,16 +85,7 @@ const useSessionStore = create<SessionStore>()(
       try {
         res = await useConfigStore.getState().sessionHandler?.initSessionList();
         set({
-          sessionList: res?.map(
-            (item: any) =>
-              new Session({
-                id: item.id,
-                title: item.title || '新建会话',
-                attachment: item.attachment,
-                extra: item.extra,
-                store: get(),
-              }),
-          ),
+          sessionList: res,
         });
         set({ sessionListLoading: false });
         return res;
@@ -123,6 +115,7 @@ const useSessionStore = create<SessionStore>()(
         store: get(),
         id: nanoid(),
         title,
+        serviceId: sessionOption?.serviceId,
       });
 
       set({
@@ -131,7 +124,7 @@ const useSessionStore = create<SessionStore>()(
       });
 
       if (!useConfigStore.getState().disabledSession && !useConfigStore.getState().openAI) {
-        res = await useConfigStore.getState().sessionHandler?.addSession({ title });
+        res = await useConfigStore.getState().sessionHandler?.addSession({ title, service_id: sessionOption?.serviceId });
         // 更新session id
         // 修复：只有当 res 存在且有 id 时才更新 session id 和 title，以避免 TypeError
         if (res && res.id) {
@@ -202,6 +195,12 @@ const useSessionStore = create<SessionStore>()(
       const { setMisc, scrollToBottom } = useMiscStore.getState();
       const { chat } = useChatStore.getState();
       const { isCompact } = useConfigStore.getState();
+      const { setSelectedAgentId } = useAgentStore.getState();
+
+      if (activeSession?.serviceId) {
+        setSelectedAgentId(activeSession.serviceId);
+      }
+
       scrollToBottom();
       chat.emit(Event.SESSION_CHANGE, activeSession);
 
